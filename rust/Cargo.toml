@@ -1,0 +1,18 @@
+[package]
+name = "sd_stub_rs"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+uefi = { version = "0.18.0", default-features = false, features = [ "alloc", "exts" ] }
+uefi-services = { version = "0.15.0", default-features = false, features = [ "panic_handler" ] }
+log = "0.4.17"
+goblin = { version = "0.6.0", default-features = false, features = [ "pe64", "alloc" ]}
+
+# Use software implementation because the UEFI target seems to need it.
+sha2 = { version = "0.10.6", default-features = false, features = ["force-soft"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
