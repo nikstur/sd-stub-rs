@@ -80,17 +80,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lanzaboote_stub"
-version = "0.1.0"
-dependencies = [
- "goblin",
- "log",
- "sha2",
- "uefi",
- "uefi-services",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.139"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -189,6 +178,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "systemd_stub"
+version = "0.1.0"
+dependencies = [
+ "goblin",
+ "log",
+ "sha2",
+ "uefi",
+ "uefi-services",
 ]
 
 [[package]]
