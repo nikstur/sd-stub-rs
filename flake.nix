@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     nixpkgs-test.url = "github:RaitoBezarius/nixpkgs/simplified-qemu-boot-disks";
+    nixpkgs-systemd-253.url = "github:gdamjan/nixpkgs/systemd-253";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
@@ -55,10 +56,14 @@
 
       perSystem = { config, system, pkgs, ... }:
         let
+          systemdPkgs = import inputs.nixpkgs-systemd-253 { inherit system; };
           pkgs = import nixpkgs {
             system = system;
             overlays = [
               rust-overlay.overlays.default
+              (final: prev: {
+                systemd = systemdPkgs.systemd;
+              })
             ];
           };
 
@@ -119,19 +124,21 @@
           devShells.default = pkgs.mkShell {
             shellHook = ''
               ${config.pre-commit.installationScript}
+              # Add ukify to PATH
+              export PATH=$PATH:${pkgs.systemd}/lib/systemd
             '';
 
-            packages =
-              [
-                pkgs.uefi-run
-                pkgs.openssl
-                pkgs.sbsigntool
-                pkgs.efitools
-                pkgs.python39Packages.ovmfvartool
-                pkgs.qemu
-                pkgs.nixpkgs-fmt
-                pkgs.statix
-              ];
+            packages = [
+              pkgs.uefi-run
+              pkgs.openssl
+              pkgs.sbsigntool
+              pkgs.efitools
+              pkgs.python39Packages.ovmfvartool
+              pkgs.qemu
+              pkgs.nixpkgs-fmt
+              pkgs.statix
+              pkgs.systemd
+            ];
 
             inputsFrom = [
               config.packages.default

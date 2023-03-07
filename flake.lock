@@ -179,6 +179,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-systemd-253": {
+      "locked": {
+        "lastModified": 1677152629,
+        "narHash": "sha256-4NRWvGonvHQgpwszCS4BeRObhAfagHmtSkOq/I0akH0=",
+        "owner": "gdamjan",
+        "repo": "nixpkgs",
+        "rev": "cda7b1c3343f20c4a77be544f1d8e33579690723",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gdamjan",
+        "ref": "systemd-253",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-test": {
       "locked": {
         "lastModified": 1671812130,
@@ -228,6 +244,7 @@
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-systemd-253": "nixpkgs-systemd-253",
         "nixpkgs-test": "nixpkgs-test",
         "pre-commit-hooks-nix": "pre-commit-hooks-nix",
         "rust-overlay": "rust-overlay"
