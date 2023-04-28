@@ -61,6 +61,12 @@
             system = system;
             overlays = [
               rust-overlay.overlays.default
+              (final: prev: {
+                systemdUkify = prev.systemdMinimal.override {
+                  withEfi = true;
+                  withUkify = true;
+                };
+              })
             ];
           };
 
@@ -135,8 +141,7 @@
           devShells.default = pkgs.mkShell {
             shellHook = ''
               ${config.pre-commit.installationScript}
-              # Add ukify to PATH
-              export PATH=$PATH:${pkgs.systemd}/lib/systemd
+              export PATH=$PATH:${pkgs.systemdUkify}/lib/systemd
             '';
 
             packages = [
@@ -144,11 +149,10 @@
               pkgs.openssl
               pkgs.sbsigntool
               pkgs.efitools
-              pkgs.python39Packages.ovmfvartool
+              pkgs.python3Packages.ovmfvartool
               pkgs.qemu
               pkgs.nixpkgs-fmt
               pkgs.statix
-              pkgs.systemd
             ];
 
             inputsFrom = [
