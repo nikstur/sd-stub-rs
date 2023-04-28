@@ -3,8 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
-    nixpkgs-test.url = "github:RaitoBezarius/nixpkgs/simplified-qemu-boot-disks";
-    nixpkgs-systemd-253.url = "github:gdamjan/nixpkgs/systemd-253";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
@@ -37,7 +35,7 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-test, crane, rust-overlay, flake-parts, ... }:
+  outputs = inputs@{ nixpkgs, crane, rust-overlay, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } ({ moduleWithSystem, ... }: {
       imports = [
         # Derive the output overlay automatically from all packages that we define.
@@ -56,21 +54,15 @@
 
       perSystem = { config, system, pkgs, ... }:
         let
-          systemdPkgs = import inputs.nixpkgs-systemd-253 { inherit system; };
           pkgs = import nixpkgs {
             system = system;
             overlays = [
               rust-overlay.overlays.default
-              (final: prev: {
-                systemd = systemdPkgs.systemd;
-              })
             ];
           };
 
-          testPkgs = import nixpkgs-test { system = "x86_64-linux"; };
-
-          rust-nightly = pkgs.rust-bin.fromRustupToolchainFile ./rust/rust-toolchain.toml;
-          craneLib = crane.lib.x86_64-linux.overrideToolchain rust-nightly;
+          uefi-rust-stable = pkgs.rust-bin.fromRustupToolchainFile ./rust/rust-toolchain.toml;
+          craneLib = crane.lib.x86_64-linux.overrideToolchain uefi-rust-stable;
 
           # Build attributes for a Rust application.
           buildRustApp =
@@ -84,6 +76,22 @@
                 inherit src;
                 CARGO_BUILD_TARGET = target;
                 inherit doCheck;
+
+                # Workaround for https://github.com/ipetkov/crane/issues/262.
+                dummyrs = pkgs.writeText "dummy.rs" ''
+                  #![allow(unused)]
+                  #![cfg_attr(
+                    any(target_os = "none", target_os = "uefi"),
+                    no_std,
+                    no_main,
+                  )]
+                  #[cfg_attr(any(target_os = "none", target_os = "uefi"), panic_handler)]
+                  fn panic(_info: &::core::panic::PanicInfo<'_>) -> ! {
+                      loop {}
+                  }
+                  #[cfg_attr(any(target_os = "none", target_os = "uefi"), export_name = "efi_main")]
+                  fn main() {}
+                '';
               } // extraArgs;
 
               cargoArtifacts = craneLib.buildDepsOnly commonArgs;
