@@ -5,11 +5,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
     pre-commit-hooks-nix = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
+      inputs.flake-compat.follows = "flake-compat";
     };
 
     # We only have this input to pass it to other dependencies and
@@ -21,6 +23,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
       inputs.flake-utils.follows = "flake-utils";
+      inputs.flake-compat.follows = "flake-compat";
     };
 
     rust-overlay = {
