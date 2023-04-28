@@ -127,7 +127,9 @@
 
           checks = {
             clippy = stubCrane.clippy;
-          };
+          } // (import .nix/tests/sd-stub.nix {
+            inherit pkgs;
+          });
 
           pre-commit = {
             check.enable = true;
