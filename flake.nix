@@ -127,8 +127,10 @@
 
           checks = {
             clippy = stubCrane.clippy;
-          } // (import .nix/tests/sd-stub.nix {
-            inherit pkgs;
+          } // (import ./nix/tests/sd-stub.nix {
+            pkgs = pkgs.extend (final: prev: {
+              sd-stub-rs = config.packages.default;
+            });
           });
 
           pre-commit = {
